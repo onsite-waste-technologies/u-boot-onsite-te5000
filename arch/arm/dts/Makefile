@@ -354,6 +354,9 @@ dtb-$(CONFIG_TARGET_SAMA5D2_XPLAINED) += \
 dtb-$(CONFIG_TARGET_SAMA5D27_SOM1_EK) += \
 	at91-sama5d27_som1_ek.dtb
 
+dtb-$(CONFIG_TARGET_BLUESTONE_TE5000) += \
+	at91-bluestone_te5000.dtb
+
 dtb-$(CONFIG_TARGET_SAMA5D3XEK) += \
 	sama5d31ek.dtb \
 	sama5d33ek.dtb \

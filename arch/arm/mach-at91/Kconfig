@@ -105,6 +105,12 @@ config TARGET_SAMA5D27_SOM1_EK
 	select SUPPORT_SPL
 	select BOARD_EARLY_INIT_F
 
+config TARGET_BLUESTONE_TE5000
+	bool "Bluestone TE5000 board"
+	select CPU_V7
+	select SUPPORT_SPL
+	select BOARD_EARLY_INIT_F
+
 config TARGET_SAMA5D3_XPLAINED
 	bool "SAMA5D3 Xplained board"
 	select CPU_V7
@@ -207,5 +213,6 @@ source "board/ronetix/pm9g45/Kconfig"
 source "board/siemens/corvus/Kconfig"
 source "board/siemens/taurus/Kconfig"
 source "board/siemens/smartweb/Kconfig"
+source "board/bluestone/te5000/Kconfig"
 
 endif

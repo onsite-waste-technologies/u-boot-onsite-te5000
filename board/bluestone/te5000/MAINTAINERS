@@ -1,0 +1,6 @@
+BLUESTONE TE5000 BOARD
+M:	Dennis Lambe Jr. <dlambe@innovative-electronics.com>
+S:	Maintained
+F:	board/bluestone/te5000/
+F:	include/configs/bluestone_te5000.h
+F:	configs/bluestone_te5000_defconfig

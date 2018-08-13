@@ -1,0 +1,15 @@
+if TARGET_BLUESTONE_TE5000
+
+config SYS_BOARD
+	default "te5000"
+
+config SYS_VENDOR
+	default "bluestone"
+
+config SYS_SOC
+	default "at91"
+
+config SYS_CONFIG_NAME
+	default "bluestone_te5000"
+
+endif
