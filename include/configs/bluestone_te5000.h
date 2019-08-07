@@ -54,12 +54,20 @@
 #define CONFIG_ENV_SIZE		0x4000
 /* bootstrap + u-boot + env in sd card */
 #undef CONFIG_BOOTCOMMAND
-#define CONFIG_BOOTCOMMAND	"fatload mmc 0:1 0x21000000 at91-bluestone_te5000.dtb; " \
-				"fatload mmc 0:1 0x22000000 zImage; " \
+#define CONFIG_BOOTCOMMAND	"run mmcbootargs; " \
+				"fatload mmc 0:${bootpart} 0x21000000 at91-bluestone_te5000.dtb; " \
+				"fatload mmc 0:${bootpart} 0x22000000 zImage; " \
 				"bootz 0x22000000 - 0x21000000"
 #undef CONFIG_BOOTARGS
-#define CONFIG_BOOTARGS \
-	"console=ttyS0,115200 earlyprintk root=/dev/mmcblk0p2 rootfstype=ext4 rootrw=/dev/mmcblk0p4 rw rootwait"
+#undef CONFIG_EXTRA_ENV_SETTINGS
+#define CONFIG_EXTRA_ENV_SETTINGS					\
+	"bootpart=1\0"							\
+	"rootpart=2\0"							\
+	"rootrwpart=4\0"						\
+	"mmcbootargs=setenv bootargs console=ttyS0,115200 earlyprintk"	\
+	" root=/dev/mmcblk0p${rootpart} rootrw=/dev/mmcblk0p${rootrwpart}" \
+	" rw rootwait\0"
+
 #endif
 
 #ifdef CONFIG_QSPI_BOOT
