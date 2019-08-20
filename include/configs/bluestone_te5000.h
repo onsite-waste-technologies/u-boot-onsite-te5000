@@ -46,6 +46,7 @@
 
 #ifdef CONFIG_SD_BOOT
 /* u-boot env in sd/mmc card */
+#define CONFIG_SUPPORT_RAW_INITRD
 #define CONFIG_ENV_IS_IN_FAT
 #define CONFIG_FAT_WRITE
 #define FAT_ENV_INTERFACE	"mmc"
@@ -54,19 +55,27 @@
 #define CONFIG_ENV_SIZE		0x4000
 /* bootstrap + u-boot + env in sd card */
 #undef CONFIG_BOOTCOMMAND
-#define CONFIG_BOOTCOMMAND	"run mmcbootargs; " \
-				"ext4load mmc 0:${rootpart} 0x21000000 at91-bluestone_te5000.dtb; " \
-				"ext4load mmc 0:${rootpart} 0x22000000 zImage; " \
-				"bootz 0x22000000 - 0x21000000"
+#define CONFIG_BOOTCOMMAND                                      \
+    "run loadinitrd; run loaddtb; run loadkern; "               \
+    "run mkbootargs; "                                          \
+    "bootz ${kernaddr} ${initrdaddr}:${initrdsz} ${dtbaddr}"
 #undef CONFIG_BOOTARGS
 #undef CONFIG_EXTRA_ENV_SETTINGS
-#define CONFIG_EXTRA_ENV_SETTINGS					\
-	"bootpart=1\0"							\
-	"rootpart=2\0"							\
-	"rootrwpart=4\0"						\
-	"mmcbootargs=setenv bootargs console=ttyS0,115200 earlyprintk"	\
-	" root=/dev/mmcblk0p${rootpart} rootrw=/dev/mmcblk0p${rootrwpart}" \
-	" rw rootwait\0"
+#define CONFIG_EXTRA_ENV_SETTINGS                                       \
+    "bootpart=1\0"                                                      \
+    "rootpart=2\0"                                                      \
+    "rootrwpart=4\0"                                                    \
+    "initrdaddr=0x21000000\0"                                           \
+    "dtbaddr=0x22000000\0"                                              \
+    "kernaddr=0x23000000\0"                                             \
+    "mkbootargs=setenv bootargs console=ttyS0,115200 earlyprintk"       \
+    "  initrd=${initrdaddr},${initrdsz}"                                \
+    "  root=/dev/mmcblk0p${rootpart} rootrw=/dev/mmcblk0p${rootrwpart}" \
+    "  rw rootwait\0"                                                   \
+    "loadinitrd=ext4load mmc 0:${rootpart} ${initrdaddr} boot/initrd.img-bluestone-te5000.cpio.gz;" \
+    "  setenv initrdsz 0x${filesize}\0"                                 \
+    "loaddtb=ext4load mmc 0:${rootpart} ${dtbaddr} boot/at91-bluestone_te5000.dtb\0" \
+    "loadkern=ext4load mmc 0:${rootpart} ${kernaddr} boot/zImage\0"
 #endif
 
 #ifdef CONFIG_QSPI_BOOT
