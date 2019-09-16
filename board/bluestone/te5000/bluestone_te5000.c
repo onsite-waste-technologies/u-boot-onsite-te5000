@@ -107,6 +107,73 @@ int misc_init_r(void)
 }
 #endif
 
+#ifdef CONFIG_BOARD_LATE_INIT
+#define LCD_ADDR 0x3c
+#define LCD_COLS 20
+
+static void lcd_write(unsigned char offset, uint8_t *data, unsigned int len)
+{
+	/* This exploits a bug in the at91 i2c driver which special-cases
+	 * a 2-element message list and copies the first message's paylaod
+	 * into the offset register rather than transmitting a separate
+	 * packet. */
+
+	struct udevice *bus, *dev;
+	struct dm_i2c_chip *chip;
+	struct i2c_msg msg[2];
+	uclass_get_device_by_seq(UCLASS_I2C, 0, &bus);
+	dm_i2c_probe(bus, LCD_ADDR, 0, &dev);
+	chip = dev_get_parent_platdata(dev);
+
+	msg[0].addr = msg[1].addr = chip->chip_addr;
+	msg[0].flags = msg[1].flags = chip->flags;
+	msg[0].buf = &offset;
+	msg[0].len = 1;
+
+	msg[1].buf = data;
+	msg[1].len = len;
+
+	dm_i2c_xfer(dev, msg, 2);
+}
+
+static void lcd_write_cmd(uint8_t cmd)
+{
+	lcd_write(0x80, &cmd, 1);
+}
+
+static void lcd_write_string(char *data)
+{
+	lcd_write(0x40, (uint8_t *)data, strlen(data));
+}
+
+static void lcd_goto(unsigned char row, unsigned char col)
+{
+	static const unsigned char
+		ddram_row_addrs[] = {0x00, 0x20, 0x40, 0x60};
+	unsigned char ddram_addr = ddram_row_addrs[row] + col;
+	lcd_write_cmd(0x80 | ddram_addr);
+}
+
+static void lcd_write_string_at(unsigned char row,
+				unsigned char col,
+				char *s)
+{
+	lcd_goto(row, col);
+	lcd_write_string(s);
+}
+
+static void lcd_splash(void)
+{
+	lcd_write_string_at(1, 14, "...");
+}
+
+int board_late_init(void)
+{
+	lcd_splash();
+	return 0;
+}
+#endif /* defined(CONFIG_BOARD_LATE_INIT) */
+
 /* SPL */
 #ifdef CONFIG_SPL_BUILD
 void spl_board_init(void)
