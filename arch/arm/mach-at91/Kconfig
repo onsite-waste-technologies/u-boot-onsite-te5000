@@ -193,6 +193,14 @@ config TARGET_SAMA5D27_SOM1_EK
 	  processor-based SAMA5D2 MPU with up to 1 Gbit DDR2-SDRAM
 	  in a single package.
 
+config TARGET_ONSITE_TE5000
+bool "OnSite TE5000 board"
+	select BOARD_EARLY_INIT_F
+	select BOARD_LATE_INIT
+	select CPU_V7A
+	select SUPPORT_SPL
+	select ATMEL_SFR
+
 config TARGET_SAMA5D27_WLSOM1_EK
 	bool "SAMA5D27 WLSOM1 EK board"
 	select SAMA5D2
@@ -348,6 +356,7 @@ source "board/siemens/taurus/Kconfig"
 source "board/siemens/smartweb/Kconfig"
 source "board/laird/wb45n/Kconfig"
 source "board/laird/wb50n/Kconfig"
+source "board/onsite/te5000/Kconfig"
 
 config SPL_LDSCRIPT
 	default "arch/arm/mach-at91/arm926ejs/u-boot-spl.lds" if CPU_ARM926EJS

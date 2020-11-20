@@ -1,0 +1,15 @@
+if TARGET_ONSITE_TE5000
+
+config SYS_BOARD
+	default "te5000"
+
+config SYS_VENDOR
+	default "onsite"
+
+config SYS_SOC
+	default "at91"
+
+config SYS_CONFIG_NAME
+	default "onsite_te5000"
+
+endif

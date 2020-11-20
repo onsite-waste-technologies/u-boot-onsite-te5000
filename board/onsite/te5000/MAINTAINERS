@@ -1,0 +1,6 @@
+SAMA5D27 SOM1 EK BOARD
+M:	Dennis Lambe Jr. <dlambe@innovative-electronics.com>
+S:	Maintained
+F:	board/onsite/te5000/
+F:	include/configs/onsite_te5000.h
+F:	configs/onsite_te5000_defconfig
