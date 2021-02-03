@@ -1290,6 +1290,12 @@ config CMD_CLCD
 	help
 	  Write strings to a character LCD
 
+config CMD_FATAL
+	bool "fatal"
+	default n
+	help
+	  Write a fatal error to the character LCD
+
 config CMD_ITEST
 	bool "itest"
 	default y
