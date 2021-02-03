@@ -9,6 +9,8 @@
 #include <init.h>
 #include <dm.h>
 #include <i2c.h>
+#include <clcd.h>
+#include <fatal_message.h>
 #include <asm/io.h>
 #include <asm/arch/at91_common.h>
 #include <asm/arch/atmel_pio4.h>
@@ -29,68 +31,41 @@ static void board_leds_init(void)
 	atmel_pio4_set_pio_output(PIN_LED_GRN, 0);
 }
 
+static void early_show_progress(int progress)
+{
+    printf("show_boot_progress(%d)\n", progress);
+}
+
+static void(*boot_progress_callback)(int progress) = early_show_progress;
+
+void show_boot_progress(int progress)
+{
+    if (boot_progress_callback)
+        boot_progress_callback(progress);
+}
+
 #ifdef CONFIG_BOARD_LATE_INIT
-#define LCD_ADDR 0x3c
-#define LCD_COLS 20
-
-static void lcd_write(unsigned char offset, uint8_t *data, unsigned int len)
+static void clcd_show_progress(int progress)
 {
-	/* This exploits a bug in the at91 i2c driver which special-cases
-	 * a 2-element message list and copies the first message's paylaod
-	 * into the offset register rather than transmitting a separate
-	 * packet. */
+    static int last_progress = 0;
 
-	struct udevice *bus, *dev;
-	struct dm_i2c_chip *chip;
-	struct i2c_msg msg[2];
-	uclass_get_device_by_seq(UCLASS_I2C, 0, &bus);
-	dm_i2c_probe(bus, LCD_ADDR, 0, &dev);
-	chip = dev_get_parent_platdata(dev);
-
-	msg[0].addr = msg[1].addr = chip->chip_addr;
-	msg[0].flags = msg[1].flags = chip->flags;
-	msg[0].buf = &offset;
-	msg[0].len = 1;
-
-	msg[1].buf = data;
-	msg[1].len = len;
-
-	dm_i2c_xfer(dev, msg, 2);
-}
-
-static void lcd_write_cmd(uint8_t cmd)
-{
-	lcd_write(0x80, &cmd, 1);
-}
-
-static void lcd_write_string(char *data)
-{
-	lcd_write(0x40, (uint8_t *)data, strlen(data));
-}
-
-static void lcd_goto(unsigned char row, unsigned char col)
-{
-	static const unsigned char
-		ddram_row_addrs[] = {0x00, 0x20, 0x40, 0x60};
-	unsigned char ddram_addr = ddram_row_addrs[row] + col;
-	lcd_write_cmd(0x80 | ddram_addr);
-}
-
-static void lcd_write_string_at(unsigned char row,
-				unsigned char col,
-				char *s)
-{
-	lcd_goto(row, col);
-	lcd_write_string(s);
+    /* -BOOTSTAGE_ID_NET_LOADED isn't actually an error */
+    if (progress < 0 && progress != -BOOTSTAGE_ID_NET_LOADED) {
+        fatal_message(0, (-progress) << 16 | last_progress);
+    } else {
+        last_progress = progress;
+    }
 }
 
 static void lcd_splash(void)
 {
-	lcd_write_string_at(1, 14, "...");
+    clcd_goto(1, 12);
+	clcd_write_string(".");
 }
 
 int board_late_init(void)
 {
+    boot_progress_callback = clcd_show_progress;
 	lcd_splash();
 	return 0;
 }
