@@ -34,10 +34,7 @@
 
 #undef CONFIG_BOOTCOMMAND
 #ifdef CONFIG_SD_BOOT
-/* bootstrap + u-boot + env in sd card */
-#define CONFIG_BOOTCOMMAND	"fatload mmc " CONFIG_ENV_FAT_DEVICE_AND_PART " 0x21000000 at91-sama5d27_som1_ek.dtb; " \
-				"fatload mmc " CONFIG_ENV_FAT_DEVICE_AND_PART " 0x22000000 zImage; " \
-				"bootz 0x22000000 - 0x21000000"
+#define CONFIG_BOOTCOMMAND "fatal 0 0" /* Refuse to boot without uboot.env */
 #endif
 
 #ifdef CONFIG_QSPI_BOOT
